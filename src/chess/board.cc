@@ -730,6 +730,24 @@ bool ChessBoard::HasMatingMaterial() const {
   return light_bishop && dark_bishop;
 }
 
+float ChessBoard::MaterialBalance() const {
+  float material = 0.0f;
+  auto side = ours();
+
+  float white = ((side*queens()).count()*9.0) + ((side*rooks()).count()*5.0) + ((side*bishops()).count()*3.1) +
+          ((our_knights()).count()*3.0) + ((side*pawns()).count()*1.0);
+
+  side = theirs();
+
+  float black = ((side*queens()).count()*9.0) + ((side*rooks()).count()*5.0) + ((side*bishops()).count()*3.1) +
+          ((their_knights()).count()*3.0) + ((side*pawns()).count()*1.0);
+
+  material = white - black;
+  material *= 0.001;
+
+  return flipped_ ? -material : material;
+}
+
 string ChessBoard::DebugString() const {
   string result;
   for (int i = 7; i >= 0; --i) {

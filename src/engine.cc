@@ -53,6 +53,7 @@ const char* kTimeCurvePeak = "Time weight curve peak ply";
 const char* kTimeCurveRightWidth = "Time weight curve width right of peak";
 const char* kTimeCurveLeftWidth = "Time weight curve width left of peak";
 const char* kSyzygyTablebaseStr = "List of Syzygy tablebase directories";
+const char* kPrettyEndgameStr = "Make endgame prettier.";
 
 const char* kAutoDiscover = "<autodiscover>";
 
@@ -97,6 +98,9 @@ void EngineController::PopulateOptions(OptionsParser* options) {
   options->Add<FloatOption>(kTimeCurveRightWidth, 0.0f, 1000.0f,
                             "time-curve-right-width") = 74.0f;
   options->Add<StringOption>(kSyzygyTablebaseStr, "syzygy-paths", 's');
+
+  options->Add<BoolOption>(kPrettyEndgameStr, "pretty-endgame") = false;
+
   // Add "Ponder" option to signal to GUIs that we support pondering.
   // This option is currently not used by lc0 in any way.
   options->Add<BoolOption>("Ponder", "ponder") = false;

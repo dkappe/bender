@@ -67,6 +67,10 @@ class ChessBoard {
   // Checks whether at least one of the sides has mating material.
 
   bool HasMatingMaterial() const;
+
+  // Material balance
+  float MaterialBalance() const;
+
   // Generates legal moves.
   MoveList GenerateLegalMoves() const;
   // Check whether pseudolegal move is legal.

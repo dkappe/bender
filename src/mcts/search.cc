@@ -59,6 +59,7 @@ const char* Search::kAllowedNodeCollisionsStr =
     "Allowed node collisions, per batch";
 const char* Search::kOutOfOrderEvalStr = "Out-of-order cache backpropagation";
 const char* Search::kStickyCheckmateStr = "Ignore alternatives to checkmate";
+const char* Search::kPrettyEndgameStr = "Make endgame prettier.";
 
 namespace {
 const int kSmartPruningToleranceNodes = 100;
@@ -122,6 +123,7 @@ Search::Search(const NodeTree& tree, Network* network,
       kPolicySoftmaxTemp(options.Get<float>(kPolicySoftmaxTempStr)),
       kAllowedNodeCollisions(options.Get<int>(kAllowedNodeCollisionsStr)),
       kOutOfOrderEval(options.Get<bool>(kOutOfOrderEvalStr)),
+      kPrettyEndgame(options.Get<bool>(kPrettyEndgameStr)),
       kStickyCheckmate(options.Get<bool>(kStickyCheckmateStr)) {}
 
 namespace {
@@ -804,14 +806,20 @@ void SearchWorker::ExtendNode(Node* node) {
             search_->syzygy_tb_->max_cardinality()) {
       ProbeState state;
       WDLScore wdl = search_->syzygy_tb_->probe_wdl(history_.Last(), &state);
+      // Do we need to calculate the material balance to make the endgames
+      // pretty?
+      float material = 0.0f;
+      if (search_->kPrettyEndgame) {
+          material = board.MaterialBalance();
+      }
       // Only fail state means the WDL is wrong, probe_wdl may produce correct
       // result with a stat other than OK.
       if (state != FAIL) {
         // If the colors seem backwards, check the checkmate check above.
         if (wdl == WDL_WIN) {
-          node->MakeTerminal(GameResult::BLACK_WON);
+          node->MakeTerminal(GameResult::BLACK_WON, material);
         } else if (wdl == WDL_LOSS) {
-          node->MakeTerminal(GameResult::WHITE_WON);
+          node->MakeTerminal(GameResult::WHITE_WON, material);
         } else {  // Cursed wins and blessed losses count as draws.
           node->MakeTerminal(GameResult::DRAW);
         }

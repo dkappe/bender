@@ -225,6 +225,17 @@ void Node::MakeTerminal(GameResult result) {
   }
 }
 
+void Node::MakeTerminal(GameResult result, float material) {
+  is_terminal_ = true;
+  if (result == GameResult::DRAW) {
+    q_ = 0.0f+material;
+  } else if (result == GameResult::WHITE_WON) {
+    q_ = 1.0f+material;
+  } else if (result == GameResult::BLACK_WON) {
+    q_ = -1.0f+material;
+  }
+}
+
 bool Node::TryStartScoreUpdate() {
   if (n_ == 0 && n_in_flight_ > 0) return false;
   ++n_in_flight_;
