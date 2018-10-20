@@ -9,7 +9,7 @@
 #include "string.h"
 #include <fstream>
 #include <queue>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 
 
@@ -26,7 +26,7 @@ public:
 private:
 
     static const std::string epds[];
-    static boost::mutex qlock_;
+    static std::mutex qlock_;
     static std::queue<std::string> queue_;
 
 };

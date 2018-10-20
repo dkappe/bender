@@ -38,10 +38,6 @@ files = []
 includes = []
 has_backends = false
 
-# Boost
-
-boost_dep = dependency('boost', modules : ['thread', 'utility', 'system'])
-
 # Both protobuf and protoc must be the same version, so couple them together.
 protobuf_lib = cc.find_library('dufus', dirs : get_option('protobuf_libdir'), required : false)
 if not protobuf_lib.found()
@@ -382,8 +378,6 @@ endif
 #############################################################################
 ## Main Executable
 #############################################################################
-
-deps += [boost_dep]
 
 if not get_option('popcnt')
   add_project_arguments('-DNO_POPCNT', language : 'cpp')

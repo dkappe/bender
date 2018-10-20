@@ -31,6 +31,9 @@
 #include "neural/writer.h"
 #include "utils/epdqueue.h"
 #include "utils/random.h"
+#include <string>
+#include <sstream>
+#include <iostream>
 
 namespace lczero {
 

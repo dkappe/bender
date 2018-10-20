@@ -10,7 +10,7 @@ epdqueue::epdqueue() {
 epdqueue::~epdqueue() {
 }
 
-boost::mutex epdqueue::qlock_;
+std::mutex epdqueue::qlock_;
 std::queue<std::string> epdqueue::queue_;
 
 
