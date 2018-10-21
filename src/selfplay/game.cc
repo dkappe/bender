@@ -95,7 +95,7 @@ SelfPlayGame::SelfPlayGame(PlayerOptions player1, PlayerOptions player2,
       abort_ = true;
       return;
     } else {
-      int ply = Random::Get().GetInt(0,50);
+      int ply = Random::Get().GetInt(0,99);
 
       std::ostringstream stringStream;
       stringStream << " " << ply << " 80";
