@@ -78,7 +78,7 @@ SelfPlayGame::SelfPlayGame(PlayerOptions player1, PlayerOptions player2,
   if (!tb_paths.empty()) {
     syzygy_tb_ = GetTB(tb_paths);
   } else {
-    syzygy_tb_ = nullptr;
+    syzygy_tb_ = nullptr; // init
   }
 
   bool use_epd = false;
