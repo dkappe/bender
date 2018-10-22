@@ -77,6 +77,8 @@ SelfPlayGame::SelfPlayGame(PlayerOptions player1, PlayerOptions player2,
   std::string tb_paths = options_[0].uci_options->Get<std::string>(kSyzygyTablebaseStr);
   if (!tb_paths.empty()) {
     syzygy_tb_ = GetTB(tb_paths);
+  } else {
+    syzygy_tb_ = nullptr;
   }
 
   bool use_epd = false;
