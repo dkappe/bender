@@ -42,6 +42,7 @@ const char* kReuseTreeStr = "Reuse the node statistics between moves";
 const char* kResignPercentageStr = "Resign when win percentage drops below n";
 const char* kSyzygyTablebaseStr = "List of Syzygy tablebase directories";
 const char* kStartposStr = "Use startpos.epd to start self-play games";
+const char* kFenStartposStr = "startpos.epd had fen's in it instead of epds.";
 
 }  // namespace
 
@@ -87,6 +88,11 @@ SelfPlayGame::SelfPlayGame(PlayerOptions player1, PlayerOptions player2,
   }
 
 
+  bool is_fen = false;
+  if (options_[0].uci_options->Get<bool>(kFenStartposStr)) {
+    is_fen = true;
+  }
+
   tree_[0] = std::make_shared<NodeTree>();
   std::string epd;
 
@@ -96,7 +102,7 @@ SelfPlayGame::SelfPlayGame(PlayerOptions player1, PlayerOptions player2,
       // out of epd's
       abort_ = true;
       return;
-    } else {
+    } else if (!is_fen) {
       int ply = Random::Get().GetInt(0,99);
 
       std::ostringstream stringStream;

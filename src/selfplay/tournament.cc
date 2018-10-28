@@ -53,6 +53,7 @@ const char* kResignPlaythroughStr =
     "The percentage of games which ignore resign";
 const char* kSyzygyTablebaseStr = "List of Syzygy tablebase directories";
 const char* kStartposStr = "Use startpos.epd to start self-play games";
+const char* kFenStartposStr = "startpos.epd had fen's in it instead of epds.";
 
 // Value for network autodiscover.
 const char* kAutoDiscover = "<autodiscover>";
@@ -82,6 +83,7 @@ void SelfPlayTournament::PopulateOptions(OptionsParser* options) {
                             "resign-playthrough") = 0.0f;
   options->Add<StringOption>(kSyzygyTablebaseStr, "syzygy-paths", 's');
   options->Add<BoolOption>(kStartposStr, "startpos") = false;
+  options->Add<BoolOption>(kFenStartposStr, "fen-start") = false;
 
 
   Search::PopulateUciParams(options);
