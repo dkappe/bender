@@ -17,6 +17,6 @@ cd build
 %MSBuild%  ^
 /p:Configuration=Release ^
 /p:Platform=x64 ^
-/p:PreferredToolArchitecture=x64 lc0.sln ^
+/p:PreferredToolArchitecture=x64 bender.sln ^
 /filelogger
 
