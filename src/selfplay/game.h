@@ -103,6 +103,12 @@ class SelfPlayGame {
 
   // Training data to send.
   std::vector<V3TrainingData> training_data_;
+
+
+    // Syzygy
+    SyzygyTablebase *syzygy_tb_;
+
+    static SyzygyTablebase* GetTB(std::string path);
 };
 
 }  // namespace lczero

@@ -29,6 +29,7 @@
 #include <algorithm>
 
 #include "neural/writer.h"
+#include "utils/goodies.h"
 
 namespace lczero {
 
@@ -38,28 +39,91 @@ const OptionId kReuseTreeId{"reuse-tree", "ReuseTree",
 const OptionId kResignPercentageId{
     "resign-percentage", "ResignPercentage",
     "Resign when win percentage drops below specified value."};
+
 const OptionId kResignEarliestMoveId{"resign-earliest-move",
                                      "ResignEarliestMove",
                                      "Earliest move that resign is allowed."};
+
+const OptionId kStartposId{
+            "startpos", "StartPos",
+            "Use startpos.epd to start self-play games"
+};
+const OptionId kFenStartposId{
+            "fen", "FEN",
+            "startpos.epd had fen's in it instead of epds."
+};
+const OptionId kSyzygyTablebaseId{
+            "syzygy-paths", "SyzygyPath",
+            "List of Syzygy tablebase directories, list entries separated by system "
+            "separator (\";\" for Windows, \":\" for Linux).",
+            's'
+};
+
 }  // namespace
+
+    SyzygyTablebase* SelfPlayGame::GetTB(std::string path) {
+        static SyzygyTablebase tb;
+        static bool done = false;
+
+        if (!path.empty() && !done) {
+            done = true;
+            std::cerr << "Loading Syzygy tablebases from " << path << std::endl;
+            if (!tb.init(path)) {
+                std::cerr << "Failed to load Syzygy tablebases!" << std::endl;
+            } else {
+                std::cerr << "Loaded Syzygy tablebases!" << std::endl;
+            }
+        }
+
+        return &tb;
+    }
 
 void SelfPlayGame::PopulateUciParams(OptionsParser* options) {
   options->Add<BoolOption>(kReuseTreeId) = false;
   options->Add<FloatOption>(kResignPercentageId, 0.0f, 100.0f) = 0.0f;
+
   options->Add<IntOption>(kResignEarliestMoveId, 0, 1000) = 0;
+
+  options->Add<BoolOption>(kStartposId) = false;
+  options->Add<BoolOption>(kFenStartposId) = false;
+  options->Add<StringOption>(kSyzygyTablebaseId);
+
 }
 
 SelfPlayGame::SelfPlayGame(PlayerOptions player1, PlayerOptions player2,
                            bool shared_tree)
     : options_{player1, player2} {
+    // load the egtb
+    std::string tb_paths = options_[0].uci_options->Get<std::string>(kSyzygyTablebaseId.GetId());
+    if (!tb_paths.empty()) {
+        syzygy_tb_ = GetTB(tb_paths);
+    } else {
+        syzygy_tb_ = nullptr; // init
+    }
+
+    // determine epd and fen options
+    bool use_epd = options_[0].uci_options->Get<bool>(kStartposId.GetId());
+    bool is_fen = options_[0].uci_options->Get<bool>(kFenStartposId.GetId());
+
   tree_[0] = std::make_shared<NodeTree>();
-  tree_[0]->ResetToPosition(ChessBoard::kStartposFen, {});
+    std::string fen;
+
+    if (use_epd) {
+        if (is_fen) {
+            fen = goodies::PopFen();
+        } else {
+            fen = goodies::Pop();
+        }
+    } else {
+        fen = ChessBoard::kStartposFen;
+    }
+    tree_[0]->ResetToPosition(fen, {});
 
   if (shared_tree) {
     tree_[1] = tree_[0];
   } else {
     tree_[1] = std::make_shared<NodeTree>();
-    tree_[1]->ResetToPosition(ChessBoard::kStartposFen, {});
+    tree_[1]->ResetToPosition(fen, {});
   }
 }
 
@@ -90,8 +154,8 @@ void SelfPlayGame::Play(int white_threads, int black_threads, bool training,
       search_ = std::make_unique<Search>(
           *tree_[idx], options_[idx].network, options_[idx].best_move_callback,
           options_[idx].info_callback, options_[idx].search_limits,
-          *options_[idx].uci_options, options_[idx].cache, nullptr);
-      // TODO: add Syzygy option for selfplay.
+          *options_[idx].uci_options, options_[idx].cache, syzygy_tb_);
+      // DONE: add Syzygy option for selfplay.
     }
 
     // Do search.

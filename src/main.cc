@@ -31,6 +31,7 @@
 #include "utils/commandline.h"
 #include "utils/logging.h"
 #include "version.h"
+#include "utils/goodies.h"
 
 int main(int argc, const char** argv) {
   LOGFILE << "Lc0 started.";
@@ -44,6 +45,8 @@ int main(int argc, const char** argv) {
   CommandLine::RegisterMode("benchmark", "Quick benchmark");
 
   if (CommandLine::ConsumeCommand("selfplay")) {
+    // fill up the queue
+    goodies::FillQ();
     // Selfplay mode.
     SelfPlayLoop loop;
     loop.RunLoop();

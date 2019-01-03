@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Leela Chess.  If not, see <http://www.gnu.org/licenses/>.
 
-project('lc0', 'cpp',
-        default_options : ['cpp_std=c++14', 'b_ndebug=if-release'],
+
+project('bender', 'cpp',
+        default_options : ['cpp_std=c++14', 'b_ndebug=if-release', 'b_lto=true'],
         meson_version: '>=0.45')
 
 cc = meson.get_compiler('cpp')
@@ -43,13 +44,13 @@ has_backends = false
 includes += include_directories('third_party', is_system: true)
 
 # Both protobuf and protoc must be the same version, so couple them together.
-protobuf_lib = cc.find_library('libprotobuf', dirs : get_option('protobuf_libdir'), required : false)
+protobuf_lib = cc.find_library('dufus', dirs : get_option('protobuf_libdir'), required : false)
 if not protobuf_lib.found()
   protobuf_dep = dependency('protobuf', required : false)
 else
   protobuf_dep = protobuf_lib
 endif
-protoc = find_program('protoc', required : false)
+protoc = find_program('dufus', required : false)
 # For tensorflow skip system protobuf, chances are it will not work.
 if not protobuf_dep.found() or not protoc.found() or get_option('tensorflow')
   deps += subproject('protobuf').get_variable('protobuf_dep')
@@ -119,6 +120,7 @@ files += [
   'src/utils/string.cc',
   'src/utils/transpose.cc',
   'src/utils/weights_adapter.cc',
+  'src/utils/goodies.cc',
 ]
 includes += include_directories('src')
 
@@ -429,7 +431,7 @@ if not get_option('popcnt')
   add_project_arguments('-DNO_POPCNT', language : 'cpp')
 endif
 
-executable('lc0', 'src/main.cc',
+executable('bender', 'src/main.cc',
   files, include_directories: includes, dependencies: deps, install: true)
 
 
